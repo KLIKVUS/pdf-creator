@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+
+    <title>pdf-creator</title>
+
+    <link href="./styles/style.css" rel="stylesheet" type="text/css" />
+
+    <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+
+    <script defer src="./scripts/script.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;500&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header class="header">
+        <h1 class="header__title">Настройки:</h1>
+
+        <a href="/data/template.xlsx" download>Скачать шаблон xlsx файла</a>
+        
+        <div class="header__input">
+            <label>
+                <p>Выберете xlsx файл:</p>
+                <input type="file" id="table-file-uploader" accept=".xlsx">
+            </label>
+        </div>
+
+        <div class="header__input">
+            <label>
+                <p>Выберете jpg/png файл:</p>
+                <input type="file" id="file-uploader" accept=".jpg, .png">
+            </label>
+        </div>
+
+        <!-- <div class="header__input">
+            <label>
+                <p>Список значений для подставки:</p>
+                <textarea id="vars-input" placeholder="Текст1;Текст2 &#10;Текст1;Текст2 &#10;Текст1;Текст2 &#10;Текст1;Текст2 &#10;..."></textarea>
+            </label>
+        </div> -->
+
+        <div class="header__input">
+            <label>
+                <p>Цвет текста:</p>
+                <input type="color" id="text-color" value="#FFFFFF">
+            </label>
+        </div>
+
+        <div class="header__input">
+            <label>
+                <p>Размер текста в px:</p>
+                <input type="number" id="text-size" value="24">
+            </label>
+        </div>
+
+        <div class="header__input">
+            <label>
+                Сделать по центру документа:
+                <input type="checkbox" id="text-pos">
+            </label>
+        </div>
+
+        <div class="header__input">
+            <label>
+                Скрыть второй текст:
+                <input type="checkbox" id="hide-text" checked>
+            </label>
+        </div>
+
+        <div class="header__input">
+            <label>
+                Отступы по краям в px:
+                <input type="number" id="text-padding" value="0">
+            </label>
+        </div>
+
+        <button class="header__submit" onclick="startPdfGenerator()">Сделать краусиво!</button>
+    </header>
+
+    <main class="main">
+        <div class="main__pdf-preview" id="pdf-preview">
+            <div class="drag-div">
+                <div class="drag-div-text">Текст1</div>
+            </div>
+            
+            <div class="drag-div hidden">
+                <div class="drag-div-text">Текст2</div>
+            </div>
+
+            <img id="img-area" src="./images/px.png" alt="img" />
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+        integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</body>
+
+</html>
