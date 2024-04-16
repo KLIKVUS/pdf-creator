@@ -30,7 +30,7 @@ function dragElement(elmnt) {
 
     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
 
-    
+
     if (dragdivtext) dragdivtext.onmousedown = dragMouseDown;
     else elmnt.onmousedown = dragMouseDown;
 
@@ -100,14 +100,14 @@ tableFileUploader.addEventListener("change", async (event) => {
 // 
 
 
-// // Формирую массив с текстом из input
-// const varsInput = document.getElementById("vars-input");
+/* // Формирую массив с текстом из input
+const varsInput = document.getElementById("vars-input");
 
-// varsInput.addEventListener("change", (event) => {
-//     if (!event.target.value) return;
-//     textArray = event.target.value.split("\n").filter(i => i);
-// });
-// //
+varsInput.addEventListener("change", (event) => {
+    if (!event.target.value) return;
+    textArray = event.target.value.split("\n").filter(i => i);
+});
+// */
 
 
 // Получаем цвет текста
@@ -146,7 +146,7 @@ textposCheckbox.addEventListener("change", (event) => {
             break;
         case false:
             dragdivtextStyle["text-align"] = "left";
-            
+
             dragdiv.forEach(elem => {
                 elem.style.width = "auto";
                 elem.querySelector(".drag-div-text").style.textAlign = "left";
@@ -165,7 +165,7 @@ textPaddingInput.addEventListener("change", (event) => {
 
     dragdiv.forEach(elem => {
         const dragdivtext = elem.querySelector(".drag-div-text");
-        
+
         dragdivtext.style.marginLeft = padding + "px";
         dragdivtext.style.marginRight = padding + "px";
     })
@@ -181,33 +181,33 @@ hideTextCheckbox.addEventListener("change", () => {
 // 
 
 
-// // Добавить таскаемый div
-// function addDragText() {
-//     const curdragdiv = document.createElement("div");
-//     const curdragdivtext = document.createElement("div");
+/* // Добавить таскаемый div
+function addDragText() {
+    const curdragdiv = document.createElement("div");
+    const curdragdivtext = document.createElement("div");
 
-//     curdragdiv.classList.add("drag-div");
+    curdragdiv.classList.add("drag-div");
     
-//     curdragdivtext.classList.add("drag-div");
-//     curdragdivtext.innerText = "Текст"+dragdiv.length;
-//     curdragdivtext.style.fontSize = dragdivtextStyle["font-size"];
+    curdragdivtext.classList.add("drag-div");
+    curdragdivtext.innerText = "Текст"+dragdiv.length;
+    curdragdivtext.style.fontSize = dragdivtextStyle["font-size"];
 
-//     curdragdiv.appendChild(curdragdivtext);
-//     pdfPreview.appendChild(curdragdiv);
-// }
-// // 
+    curdragdiv.appendChild(curdragdivtext);
+    pdfPreview.appendChild(curdragdiv);
+}
+//  */
 
 
-// // Удалить таскаемый div
-// function addDragText() {
-//     lastParagraph.parentNode.removeChild(lastParagraph)
-// }
-// // 
+/* // Удалить таскаемый div
+function addDragText() {
+    lastParagraph.parentNode.removeChild(lastParagraph)
+}
+//  */
 
 
 // Создаем pdf
 function generatePDF({ text, HTML_Width, HTML_Height }) {
-    html2pdf()
+    return html2pdf()
         .set({
             margin: 0,
             filename: text + ".pdf",
@@ -237,50 +237,70 @@ function generatePDF({ text, HTML_Width, HTML_Height }) {
 
 
 // Запускаем создание pdf файлов
-function startPdfGenerator() {
+async function startPdfGenerator() {
     if (!tableData) return alert("Нужен файл с данными!");
-    
+
     let counter = 0;
     let HTML_Width = pdfPreview.offsetWidth;
     let HTML_Height = pdfPreview.scrollHeight;
 
     const dragdivtext = document.querySelectorAll(".drag-div-text");
-    
-    const wb = XLSX.read(tableData);
-    textArray = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {raw:false});
 
-    dragdivtext.forEach(elem => {
+    const wb = await XLSX.read(tableData);
+    textArray = await XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { raw: false });
+
+    await dragdivtext.forEach(elem => {
         elem.classList.remove("drag-div-text");
         Object.assign(elem.style, dragdivtextStyle);
     })
 
-    const interval = setInterval(() => {
-        let text = textArray[counter];
-
-        dragdivtext.forEach((elem, i) => {
+    for (const text of textArray) {
+        await dragdivtext.forEach((elem, i) => {
             if (!text && counter) {
                 elem.classList.add("drag-div-text");
                 elem.style = "";
                 elem.style.fontSize = dragdivtextStyle["font-size"] + "px";
                 elem.innerText = "Текст" + (i + 1);
-    
+
                 return;
             }
 
             if (!text) return elem.innerText = "Тестовый текст" + (i + 1);
-            if (text["text"+(i+1)]) return elem.innerText = text["text"+(i+1)].trim();
+            if (text["text" + (i + 1)]) return elem.innerText = text["text" + (i + 1)].trim();
 
             elem.innerText = "";
         })
 
-        if (!text && counter) {
-            clearInterval(interval);
-            return;
-        }
+        if (!text && counter) return;
 
-        console.log(text["fileName"])
-        generatePDF({ text: text ? text["fileName"].trim() : `Файл ${counter}`, HTML_Width, HTML_Height });
+        // generatePDF({ text: text ? text["fileName"].trim() : `Файл ${counter}`, HTML_Width, HTML_Height });
+        await html2pdf()
+            .set({
+                margin: 0,
+                filename: (text ? text["fileName"].trim() : `Файл ${counter}`) + ".pdf",
+                html2canvas: {
+                    allowTaint: true,
+                    x: 0, y: 0,
+                    scale: 1,
+                    width: HTML_Width,
+                    height: HTML_Height,
+                    windowWidth: HTML_Width,
+                    windowHeight: HTML_Height,
+                    scrollX: 0,
+                    scrollY: 0,
+                    imageTimeout: 20000,
+                },
+                jsPDF: {
+                    // compress: true,
+                    orientation: 'l',
+                    unit: "px",
+                    format: [HTML_Width, HTML_Height],
+                    hotfixes: ["px_scaling"],
+                }
+            })
+            .from(pdfPreview)
+            .save()
         ++counter;
-    }, 250)
+    }
 }
 // 
